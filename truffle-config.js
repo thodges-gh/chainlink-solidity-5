@@ -17,4 +17,9 @@ module.exports = {
       skipDryRun: true,
     },
   },
+  compilers: {
+    solc: {
+      version: '0.5.0',
+    },
+  },
 }
