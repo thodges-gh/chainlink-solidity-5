@@ -1,6 +1,24 @@
 const h = require('chainlink').helpers
 const l = require('./helpers/linkToken')
-const { expectRevert, time } = require('openzeppelin-test-helpers')
+const { BN, expectRevert, time } = require('openzeppelin-test-helpers')
+const maxUint256 = new BN('0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff')
+
+const encodeUint256 = int => {
+  const zeros = '0000000000000000000000000000000000000000000000000000000000000000'
+  const payload = int.toString(16)
+  return (zeros + payload).slice(payload.length)
+}
+
+// eslint-disable-next-line no-unused-vars
+const encodeInt256 = int => {
+  if (int >= 0) {
+    return encodeUint256(int)
+  } else {
+    const effs = 'ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff'
+    const payload = maxUint256.plus(1).minus(Math.abs(int)).toString(16)
+    return (effs + payload).slice(payload.length)
+  }
+}
 
 contract('MyContract', accounts => {
   const Oracle = artifacts.require('Oracle.sol')
@@ -80,7 +98,7 @@ contract('MyContract', accounts => {
 
   describe('#fulfill', () => {
     const expected = 50000
-    const response = web3.utils.toHex(expected)
+    const response = '0x' + encodeUint256(expected)
     let request
 
     beforeEach(async () => {
@@ -100,10 +118,7 @@ contract('MyContract', accounts => {
 
     it('records the data given to it by the oracle', async () => {
       const currentPrice = await cc.data.call()
-      assert.equal(
-        web3.utils.toHex(currentPrice),
-        web3.utils.padRight(expected, 64)
-      )
+      assert.isTrue(new BN(currentPrice).eq(new BN(expected)))
     })
 
     context('when my contract does not recognize the request ID', () => {
