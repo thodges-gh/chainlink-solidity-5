@@ -20,6 +20,11 @@ const encodeInt256 = int => {
   }
 }
 
+// eslint-disable-next-line no-unused-vars
+const evmTrue = 0x0000000000000000000000000000000000000000000000000000000000000001
+// eslint-disable-next-line no-unused-vars
+const evmFalse = 0x0000000000000000000000000000000000000000000000000000000000000000
+
 contract('MyContract', accounts => {
   const Oracle = artifacts.require('Oracle.sol')
   const MyContract = artifacts.require('MyContract.sol')
