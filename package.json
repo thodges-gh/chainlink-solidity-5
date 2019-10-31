@@ -18,7 +18,7 @@
   },
   "license": "MIT",
   "dependencies": {
-    "chainlink": "0.7.6",
+    "chainlink": "0.7.7",
     "link_token": "^1.0.6",
     "openzeppelin-solidity": "^1.12.0"
   },
