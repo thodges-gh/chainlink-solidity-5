@@ -1,5 +1,4 @@
-const h = require('chainlink').helpers
-const l = require('./helpers/linkToken')
+const { helpers, generated } = require('chainlink')
 const { BN, expectRevert, time } = require('openzeppelin-test-helpers')
 const maxUint256 = new BN('0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff')
 
@@ -51,7 +50,8 @@ contract('MyContract', accounts => {
   let link, oc, cc
 
   beforeEach(async () => {
-    link = await l.linkContract(defaultAccount)
+    const linkFactory = new generated.LinkTokenFactory(defaultAccount)
+    link = await linkFactory.deploy()
     oc = await Oracle.new(link.address, { from: defaultAccount })
     cc = await MyContract.new(link.address, { from: consumer })
     await oc.setFulfillmentPermission(oracleNode, true, {
@@ -88,7 +88,7 @@ contract('MyContract', accounts => {
             times,
             { from: consumer }
           )
-          request = h.decodeRunRequest(tx.receipt.rawLogs[3])
+          request = helpers.decodeRunRequest(tx.receipt.rawLogs[3])
           assert.equal(oc.address, tx.receipt.rawLogs[3].address)
           assert.equal(
             request.topic,
@@ -117,8 +117,8 @@ contract('MyContract', accounts => {
         times,
         { from: consumer }
       )
-      request = h.decodeRunRequest(tx.receipt.rawLogs[3])
-      await h.fulfillOracleRequest(oc, request, response, { from: oracleNode })
+      request = helpers.decodeRunRequest(tx.receipt.rawLogs[3])
+      await helpers.fulfillOracleRequest(oc, request, response, { from: oracleNode })
     })
 
     it('records the data given to it by the oracle', async () => {
@@ -135,7 +135,7 @@ contract('MyContract', accounts => {
 
       it('does not accept the data provided', async () => {
         await expectRevert.unspecified(
-          h.fulfillOracleRequest(oc, request, response, {
+          helpers.fulfillOracleRequest(oc, request, response, {
             from: oracleNode
           })
         )
@@ -165,7 +165,7 @@ contract('MyContract', accounts => {
         times,
         { from: consumer }
       )
-      request = h.decodeRunRequest(tx.receipt.rawLogs[3])
+      request = helpers.decodeRunRequest(tx.receipt.rawLogs[3])
     })
 
     context('before the expiration time', () => {
