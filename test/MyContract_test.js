@@ -50,8 +50,7 @@ contract('MyContract', accounts => {
   let link, oc, cc
 
   beforeEach(async () => {
-    const linkFactory = new generated.LinkTokenFactory(defaultAccount)
-    link = await linkFactory.deploy()
+    link = await helpers.create(generated.LinkTokenFactory, defaultAccount).deploy()
     oc = await Oracle.new(link.address, { from: defaultAccount })
     cc = await MyContract.new(link.address, { from: consumer })
     await oc.setFulfillmentPermission(oracleNode, true, {
